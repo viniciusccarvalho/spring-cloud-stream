@@ -16,6 +16,9 @@
 
 package org.springframework.cloud.stream.binding;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -47,6 +50,7 @@ import org.springframework.tuple.Tuple;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -333,6 +337,68 @@ public class MessageConverterConfigurer implements MessageChannelConfigurer, Bea
 						.removeHeader(BinderHeaders.PARTITION_OVERRIDE)
 						.build();
 			}
+		}
+	}
+
+	private final class ContentTypeInterceptor extends ChannelInterceptorAdapter {
+
+		final String DEFAULT_CONTENT_TYPE = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE;
+		final String bindingContentType;
+		private final ConcurrentMap<String, MimeType> mimeTypesCache = new ConcurrentHashMap<>();
+
+		public ContentTypeInterceptor(String bindingContentType) {
+			this.bindingContentType = bindingContentType;
+		}
+
+		@Override
+		public Message<?> preSend(Message<?> message, MessageChannel channel) {
+			MimeType contentType = null;
+
+			if(bindingContentType != null){
+				contentType = MimeType.valueOf(bindingContentType);
+			}
+			if(message.getHeaders().get(MessageHeaders.CONTENT_TYPE) != null){
+
+			}
+
+			mimeTypeFromObject(message.getPayload());
+			return super.preSend(message, channel);
+		}
+
+		private MimeType mimeTypeFromObject(Object payload) {
+			Assert.notNull(payload, "payload object cannot be null.");
+			if (payload instanceof byte[]) {
+				return MimeTypeUtils.APPLICATION_OCTET_STREAM;
+			}
+			if (payload instanceof String) {
+				return  MimeTypeUtils.TEXT_PLAIN;
+			}
+			String className = payload.getClass().getName();
+			MimeType mimeType = mimeTypesCache.get(className);
+			if (mimeType == null) {
+				String modifiedClassName = className;
+				if (payload.getClass().isArray()) {
+					// Need to remove trailing ';' for an object array, e.g.
+					// "[Ljava.lang.String;" or multi-dimensional
+					// "[[[Ljava.lang.String;"
+					if (modifiedClassName.endsWith(";")) {
+						modifiedClassName = modifiedClassName.substring(0, modifiedClassName.length() - 1);
+					}
+					// Wrap in quotes to handle the illegal '[' character
+					modifiedClassName = "\"" + modifiedClassName + "\"";
+				}
+				mimeType = MimeType.valueOf("application/x-java-object;type=" + modifiedClassName);
+				mimeTypesCache.put(className, mimeType);
+			}
+			return mimeType;
+		}
+	}
+
+	private final class HeaderSerializerInterceptor extends ChannelInterceptorAdapter{
+
+		@Override
+		public Message<?> preSend(Message<?> message, MessageChannel channel) {
+			return super.preSend(message, channel);
 		}
 	}
 

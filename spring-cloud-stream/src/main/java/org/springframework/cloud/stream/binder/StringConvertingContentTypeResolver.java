@@ -28,6 +28,7 @@ import org.springframework.util.MimeType;
  * A {@link DefaultContentTypeResolver} that can parse String values.
  *
  * @author David Turanski
+ * @deprecated
  */
 public class StringConvertingContentTypeResolver extends DefaultContentTypeResolver {
 
