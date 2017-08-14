@@ -48,11 +48,5 @@ public interface BinderErrorConfigurer<C extends ConsumerProperties, T> {
 	 */
 	void destroy(Binding<T> binding, String group, C consumerProperties);
 
-	/**
-	 * Concrete implementations should override this and configure the binding target. Implementations should
-	 * keep track of what is being registered and then fetch the proper infrastructure resource to configure it.
-	 *
-	 * @param binding target binding that error configuration should be applied
-	 */
-	void configure(Binding<T> binding);
+
 }

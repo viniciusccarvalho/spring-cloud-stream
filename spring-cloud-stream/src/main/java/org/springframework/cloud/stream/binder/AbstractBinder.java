@@ -138,7 +138,6 @@ public abstract class AbstractBinder<T, C extends ConsumerProperties, P extends 
 		}
 		Binding<T> binding = doBindConsumer(name, group, target, properties);
 		registerErrorInfrastructure(binding, group, properties);
-		configureErrorInfrastructure(binding);
 		return binding;
 	}
 
@@ -188,10 +187,6 @@ public abstract class AbstractBinder<T, C extends ConsumerProperties, P extends 
 
 	protected void destroyErrorInfrastructure(Binding<T> binding, String group, C consumerProperties){
 		this.errorConfigurer.destroy(binding,group,consumerProperties);
-	}
-
-	protected void configureErrorInfrastructure(Binding<T> binding){
-		this.errorConfigurer.configure(binding);
 	}
 
 	/**

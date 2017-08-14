@@ -124,8 +124,10 @@ public abstract class AbstractMessageChannelErrorConfigurer<C extends ConsumerPr
 			beanFactory.registerSingleton(errorBridgeHandlerName, errorBridge);
 			beanFactory.initializeBean(errorBridge, errorBridgeHandlerName);
 		}
-		errorInfrastructureMap.put(consumerBinding.getDestination().getName(),new ErrorInfrastructure(errorChannel,recoverer,handler));
+		configure(binding, group, new ErrorInfrastructure(errorChannel, recoverer, handler));
 	}
+
+	protected abstract void configure(Binding<MessageChannel> binding, String group, ErrorInfrastructure errorInfrastructure);
 
 	@Override
 	public void destroy(Binding<MessageChannel> binding, String group, C consumerProperties) {

@@ -199,11 +199,6 @@ public class AbstractMessageChannelBinderTests {
 			setApplicationContext(context);
 		}
 
-		@Override
-		public void configure(Binding<MessageChannel> binding) {
-			binding.getTarget();
-		}
-
 		protected MessageHandler getErrorMessageHandler(ConsumerDestination destination, String group,
 				ConsumerProperties consumerProperties) {
 			if (this.hasRecoverer) {
@@ -212,6 +207,12 @@ public class AbstractMessageChannelBinderTests {
 			else {
 				return null;
 			}
+		}
+
+
+		@Override
+		protected void configure(Binding<MessageChannel> binding, String group, ErrorInfrastructure errorInfrastructure) {
+
 		}
 	}
 
