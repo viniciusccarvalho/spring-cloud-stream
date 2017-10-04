@@ -253,7 +253,7 @@ public class AggregationTest {
 		assertTrue(Arrays.equals(
 				((SourceConfigurer) aggregateApplicationBuilderAccessor.getPropertyValue("sourceConfigurer"))
 						.getArgs(),
-				new String[] { "--fooValue=bara" }));
+				new String[] { "--fooValue=bara", "--foo-value=bara" }));
 		final List<AggregateApplicationBuilder.ProcessorConfigurer> processorConfigurers =
 				(List<AggregateApplicationBuilder.ProcessorConfigurer>) aggregateApplicationBuilderAccessor
 				.getPropertyValue("processorConfigurers");
